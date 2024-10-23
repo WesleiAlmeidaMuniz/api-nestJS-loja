@@ -3,6 +3,7 @@ import { ImagensDTO } from './dto/Imagens.dto';
 
 export class ProdutoEntity {
   usuarioId: string;
+  id: string;
   nome: string;
   valor: number;
   quantidadeDisponivel: number;
@@ -12,4 +13,13 @@ export class ProdutoEntity {
   categoria: string;
   dataCriacao: Date;
   dataAtualizacao: Date;
+}
+
+class CaracteristicaProduto {
+  nome: string;
+  descricao: string;
+}
+class ImagemProduto {
+  url: string;
+  descricao: string;
 }
