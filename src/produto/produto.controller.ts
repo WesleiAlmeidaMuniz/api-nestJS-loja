@@ -21,14 +21,14 @@ export class ProdutosController {
   async cadastrarProduto(@Body() dadosProdutos: CriaProdutoDTO) {
     const produtoEntity = new ProdutoEntity();
     produtoEntity.usuarioId = dadosProdutos.usuarioId;
-    // produtoEntity.caracteristicas = dadosProdutos.caracteristicas;
     produtoEntity.categoria = dadosProdutos.categoria;
     produtoEntity.nome = dadosProdutos.nome;
     produtoEntity.descricao = dadosProdutos.descricao;
-    // produtoEntity.imagens = dadosProdutos.imagens;
     produtoEntity.quantidadeDisponivel = dadosProdutos.quantidadeDisponivel;
     produtoEntity.valor = dadosProdutos.valor;
     produtoEntity.id = uuid();
+    produtoEntity.caracteristicas = dadosProdutos.caracteristicas;
+    produtoEntity.imagem = dadosProdutos.imagens;
     const produtoCadastrado = this.produtosRepository.salvar(produtoEntity);
     return produtoCadastrado;
   }
