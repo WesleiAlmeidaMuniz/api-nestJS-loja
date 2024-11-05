@@ -21,7 +21,7 @@ export class CriaProdutoDTO {
   @IsNotEmpty({ message: 'Valor não pode estar vázio' })
   valor: number;
   @IsNumber(undefined, { message: 'Quantidade precisa ser um numero' })
-  quantidadeDisponivel: number;
+  quantidade_disponivel: number;
   @IsString({ message: 'Descrição precisa ser uma string' })
   descricao: string;
   @ValidateNested()

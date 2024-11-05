@@ -21,7 +21,7 @@ export class ProdutoEntity {
   @Column({ name: 'valor', nullable: false })
   valor: number;
   @Column({ name: 'quantidade_disponivel', nullable: false })
-  quantidadeDisponivel: number;
+  quantidade_disponivel: number;
   @Column({ name: 'descricao', length: 255, nullable: false })
   descricao: string;
   @Column({ name: 'categoria', length: 100, nullable: false })

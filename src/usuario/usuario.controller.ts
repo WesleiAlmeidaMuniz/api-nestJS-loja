@@ -4,42 +4,34 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   Put,
 } from '@nestjs/common';
-import { UsuarioRepository } from './usuario.repository';
-import { CriaUsuarioDTO } from './dto/CriaUsuario.dto';
-import { UsuarioEntity } from './usuario.entity';
 import { v4 as uuid } from 'uuid';
-import { ListaUsuarioDTO } from './dto/ListaUsuario.dto';
 import { AtualizaUsuarioDTO } from './dto/AtualizaUsuario.dto';
+import { CriaUsuarioDTO } from './dto/CriaUsuario.dto';
+import { ListaUsuarioDTO } from './dto/ListaUsuario.dto';
+import { UsuarioEntity } from './usuario.entity';
 import { UsuarioService } from './usuario.service';
 
 @Controller('/usuarios')
 export class UsuarioController {
-  constructor(
-    private usuarioRepository: UsuarioRepository,
-    private usuarioService: UsuarioService,
-  ) {}
+  constructor(private usuarioService: UsuarioService) {}
 
   @Post()
   async criaUsuario(@Body() dadosDoUsuario: CriaUsuarioDTO) {
-    const usuarioEntity = new UsuarioEntity();
-    usuarioEntity.email = dadosDoUsuario.email;
-    usuarioEntity.senha = dadosDoUsuario.senha;
-    usuarioEntity.nome = dadosDoUsuario.nome;
-    usuarioEntity.id = uuid();
-    this.usuarioService.criaUsuario(usuarioEntity);
+    const usuarioCriado = await this.usuarioService.criaUsuario(dadosDoUsuario);
+
     return {
-      usuario: new ListaUsuarioDTO(usuarioEntity.id, usuarioEntity.nome),
-      messagem: 'Usuário criado com sucesso!',
+      usuario: new ListaUsuarioDTO(usuarioCriado.id, usuarioCriado.nome),
+      messagem: 'usuário criado com sucesso',
     };
   }
 
   @Get()
   async listUsuarios() {
     const usuariosSalvos = await this.usuarioService.listaUsuarios();
+
     return usuariosSalvos;
   }
 
@@ -55,7 +47,7 @@ export class UsuarioController {
 
     return {
       usuario: usuarioAtualizado,
-      messagem: 'usuario atualizado com sucesso',
+      messagem: 'usuário atualizado com sucesso',
     };
   }
 
@@ -65,7 +57,7 @@ export class UsuarioController {
 
     return {
       usuario: usuarioRemovido,
-      messagem: 'Usuário removido com sucesso',
+      messagem: 'usuário removido com suceso',
     };
   }
 }

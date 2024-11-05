@@ -29,7 +29,7 @@ export class AtualizaProdutoDTO {
   valor: number;
   @IsNumber(undefined, { message: 'Quantidade precisa ser um numero' })
   @IsOptional()
-  quantidadeDisponivel: number;
+  quantidade_disponivel: number;
   @IsString({ message: 'Descrição precisa ser uma string' })
   @IsOptional()
   descricao: string;
