@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
-  IsUUID,
   ValidateNested,
 } from 'class-validator';
 import { CaracteristicaProdutoDTO } from './CaracteristicaProduto.dto';
@@ -12,8 +11,6 @@ import { ImagensDTO } from './Imagens.dto';
 import { Type } from 'class-transformer';
 
 export class CriaProdutoDTO {
-  @IsUUID(undefined, { message: `ID de usuário inválido` })
-  usuarioId: string;
   @IsString({ message: 'O nome precisa ser uma string' })
   @IsNotEmpty({ message: 'Nome não pode estar vázio' })
   nome: string;
