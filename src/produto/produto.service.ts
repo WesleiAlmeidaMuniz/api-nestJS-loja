@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ListaProdutoDTO } from './dto/ListaProduto.dto';
 import { ProdutoEntity } from './produto.entity';
@@ -21,7 +21,7 @@ export class ProdutoService {
     produtoEntity.descricao = dadosProduto.descricao;
     produtoEntity.categoria = dadosProduto.categoria;
     produtoEntity.caracteristicas = dadosProduto.caracteristicas;
-    produtoEntity.quantidade_disponivel = dadosProduto.quantidade_disponivel;
+    produtoEntity.quantidadeDisponivel = dadosProduto.quantidadeDisponivel;
     produtoEntity.imagem = dadosProduto.imagens;
 
     return this.produtoRepository.save(produtoEntity);
@@ -39,6 +39,7 @@ export class ProdutoService {
         new ListaProdutoDTO(
           produto.id,
           produto.nome,
+          produto.quantidadeDisponivel,
           produto.caracteristicas,
           produto.imagem,
         ),
@@ -48,11 +49,21 @@ export class ProdutoService {
 
   async atualizaProduto(id: string, novosDados: AtualizaProdutoDTO) {
     const entityName = await this.produtoRepository.findOneBy({ id });
+
+    if (entityName === null) {
+      throw new NotFoundException('O produto não foi encontrado');
+    }
+
     Object.assign(entityName, novosDados);
+
     await this.produtoRepository.save(entityName);
   }
 
   async deletaProduto(id: string) {
-    await this.produtoRepository.delete(id);
+    const resultado = await this.produtoRepository.delete(id);
+
+    if (!resultado.affected) {
+      throw new NotFoundException('O produto não foi encontrado');
+    }
   }
 }

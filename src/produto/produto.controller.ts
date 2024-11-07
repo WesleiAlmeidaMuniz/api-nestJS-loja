@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { AtualizaProdutoDTO } from './dto/atualizaProduto.dto';
 import { CriaProdutoDTO } from './dto/CriaProduto.dto';
-import { ProdutoEntity } from './produto.entity';
 import { ProdutoService } from './produto.service';
 
 @Controller('produtos')
@@ -18,7 +17,8 @@ export class ProdutoController {
 
   @Post()
   async criaNovo(@Body() dadosProduto: CriaProdutoDTO) {
-    const produtoCadastrado = this.produtoService.criaProduto(dadosProduto);
+    const produtoCadastrado =
+      await this.produtoService.criaProduto(dadosProduto);
     return {
       mensagem: 'Produto criado com sucesso.',
       produto: produtoCadastrado,

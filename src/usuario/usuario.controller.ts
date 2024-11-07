@@ -7,11 +7,9 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { v4 as uuid } from 'uuid';
 import { AtualizaUsuarioDTO } from './dto/AtualizaUsuario.dto';
 import { CriaUsuarioDTO } from './dto/CriaUsuario.dto';
 import { ListaUsuarioDTO } from './dto/ListaUsuario.dto';
-import { UsuarioEntity } from './usuario.entity';
 import { UsuarioService } from './usuario.service';
 
 @Controller('/usuarios')
@@ -33,6 +31,13 @@ export class UsuarioController {
     const usuariosSalvos = await this.usuarioService.listaUsuarios();
 
     return usuariosSalvos;
+  }
+
+  @Get('/:email')
+  async buscaPorEmail(@Param('email') email: string) {
+    const usuario = await this.usuarioService.buscaPorEmail(email);
+
+    return usuario;
   }
 
   @Put('/:id')

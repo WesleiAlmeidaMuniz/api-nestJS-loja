@@ -5,19 +5,28 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostgresConfigService } from './config/postgres.config.service';
 import { ConfigModule } from '@nestjs/config';
 import { PedidoModule } from './pedido/pedido.module';
+import { APP_FILTER } from '@nestjs/core';
+import { FiltroDeExcecaoGlobal } from './filtros/filtro-de-excecao-global';
 
 @Module({
   imports: [
-    UsuarioModule, 
+    UsuarioModule,
     ProdutoModule,
     ConfigModule.forRoot({
-      isGlobal:true
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       useClass: PostgresConfigService,
-      inject: [PostgresConfigService]
+      inject: [PostgresConfigService],
     }),
-    PedidoModule
+    PedidoModule,
+  ],
+
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: FiltroDeExcecaoGlobal,
+    },
   ],
 })
 export class AppModule {}

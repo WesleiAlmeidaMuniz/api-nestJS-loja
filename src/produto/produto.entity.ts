@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { ProdutoCaracteristicaEntity } from './produto-caracteristica.entity';
 import { ProdutoImagemEntity } from './produto-imagem.entity';
+import { ItemPedidoEntity } from '../pedido/itempedido.entity';
 
 @Entity({ name: 'produtos' })
 export class ProdutoEntity {
@@ -19,11 +20,18 @@ export class ProdutoEntity {
   @Column({ name: 'valor', nullable: false })
   valor: number;
   @Column({ name: 'quantidade_disponivel', nullable: false })
-  quantidade_disponivel: number;
+  quantidadeDisponivel: number;
   @Column({ name: 'descricao', length: 255, nullable: false })
   descricao: string;
   @Column({ name: 'categoria', length: 100, nullable: false })
   categoria: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: string;
+  @UpdateDateColumn({ name: 'update_at' })
+  updateAt: string;
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt: string;
 
   @OneToMany(
     () => ProdutoCaracteristicaEntity,
@@ -39,10 +47,6 @@ export class ProdutoEntity {
   )
   imagem: ProdutoImagemEntity[];
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: string;
-  @UpdateDateColumn({ name: 'update_at' })
-  updateAt: string;
-  @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: string;
+  @OneToMany(() => ItemPedidoEntity, (itemPedido) => itemPedido.produto)
+  itensPedido: ItemPedidoEntity[];
 }
