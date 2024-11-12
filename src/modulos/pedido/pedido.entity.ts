@@ -9,7 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { StatusPedido } from './enum/statuspedido.enum';
-import { UsuarioEntity } from '../usuario/usuario.entity';
+import { UsuarioEntity } from '../../modulos/usuario/usuario.entity';
 import { ItemPedidoEntity } from './itempedido.entity';
 
 @Entity({ name: 'pedido' })
