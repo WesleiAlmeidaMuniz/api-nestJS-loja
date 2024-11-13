@@ -7,13 +7,16 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AtualizaProdutoDTO } from './dto/atualizaProduto.dto';
 import { CriaProdutoDTO } from './dto/CriaProduto.dto';
 import { ProdutoService } from './produto.service';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { AutenticacaoGuard } from '../autenticacao/autenticacao/autenticacao.guard';
 
+@UseGuards(AutenticacaoGuard)
 @Controller('produtos')
 export class ProdutoController {
   constructor(private readonly produtoService: ProdutoService) {}
