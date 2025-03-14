@@ -12,10 +12,10 @@ import {
 } from 'class-validator';
 
 import { Type } from 'class-transformer';
-import { ProdutoEntity } from '../produto.entity';
+import { ProdutoEntity } from '../entities/produto.entity';
 
 export class CaracteristicaProdutoDTO {
-  id: string;
+  id: number;
 
   @IsString()
   @IsNotEmpty({ message: 'Nome da cadasterística não pode ser vazio' })
@@ -29,7 +29,7 @@ export class CaracteristicaProdutoDTO {
 }
 
 export class ImagemProdutoDTO {
-  id: string;
+  id: number;
 
   @IsUrl()
   url: string;

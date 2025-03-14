@@ -13,7 +13,6 @@ import {
 import { AtualizaProdutoDTO } from './dto/atualizaProduto.dto';
 import { CriaProdutoDTO } from './dto/CriaProduto.dto';
 import { ProdutoService } from './produto.service';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import { AutenticacaoGuard } from '../autenticacao/autenticacao/autenticacao.guard';
 
 @UseGuards(AutenticacaoGuard)
@@ -32,14 +31,12 @@ export class ProdutoController {
   }
 
   @Get()
-  @UseInterceptors(CacheInterceptor)
   async listaTodos() {
     return this.produtoService.listProdutos();
   }
 
   @Get('/:id')
-  @UseInterceptors(CacheInterceptor)
-  async listaUm(@Param('id') id: string) {
+  async listaUm(@Param('id') id: number) {
     const produtoSalvo = await this.produtoService.listaUmProduto(id);
 
     console.log('Produto sendo buscado do BD!');
@@ -49,7 +46,7 @@ export class ProdutoController {
 
   @Put('/:id')
   async atualiza(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() dadosProduto: AtualizaProdutoDTO,
   ) {
     const produtoAlterado = await this.produtoService.atualizaProduto(
@@ -58,13 +55,12 @@ export class ProdutoController {
     );
 
     return {
-      mensagem: 'produto atualizado com sucesso',
-      produto: produtoAlterado,
+      mensagem: `produto com ${id} atualizado com sucesso`,
     };
   }
 
   @Delete('/:id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: number) {
     const produtoRemovido = await this.produtoService.deletaProduto(id);
 
     return {

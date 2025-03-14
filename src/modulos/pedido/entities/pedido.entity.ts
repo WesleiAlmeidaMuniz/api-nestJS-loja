@@ -8,29 +8,29 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { StatusPedido } from './enum/statuspedido.enum';
-import { UsuarioEntity } from '../../modulos/usuario/usuario.entity';
+import { StatusPedido } from '../enum/statuspedido.enum';
 import { ItemPedidoEntity } from './itempedido.entity';
+import { UsuarioEntity } from '../../usuario/entities/usuario.entity';
 
 @Entity({ name: 'pedido' })
 export class PedidoEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: number;
 
   @Column({ name: 'valor_total', nullable: false })
   valorTotal: number;
 
-  @Column({ name: 'status', enum: StatusPedido, nullable: false })
+  @Column({ name: 'status', type: 'enum', enum: StatusPedido, nullable: false })
   status: StatusPedido;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: string;
+  createdAt: Date;
 
   @UpdateDateColumn({ name: 'update_at' })
-  updateAt: string;
+  updateAt: Date;
 
   @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: string;
+  deletedAt?: Date;
 
   @ManyToOne(() => UsuarioEntity, (usuario) => usuario.pedidos)
   usuario: UsuarioEntity;

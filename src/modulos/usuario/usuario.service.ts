@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ListaUsuarioDTO } from './dto/ListaUsuario.dto';
-import { UsuarioEntity } from './usuario.entity';
+
 import { Repository } from 'typeorm';
 import { AtualizaUsuarioDTO } from './dto/AtualizaUsuario.dto';
 import { CriaUsuarioDTO } from './dto/CriaUsuario.dto';
+import { UsuarioEntity } from './entities/usuario.entity';
 
 @Injectable()
 export class UsuarioService {
@@ -14,6 +19,13 @@ export class UsuarioService {
   ) {}
 
   async criaUsuario(dadosDoUsuario: CriaUsuarioDTO) {
+    if (
+      await this.usuarioRepository.exists({
+        where: { email: dadosDoUsuario.email },
+      })
+    ) {
+      throw new BadRequestException('Este e-mail já está sendo usado.');
+    }
     const usuarioEntity = new UsuarioEntity();
     usuarioEntity.email = dadosDoUsuario.email;
     usuarioEntity.senha = dadosDoUsuario.senha;
@@ -25,13 +37,19 @@ export class UsuarioService {
   async listaUsuarios() {
     const usuariosSalvos = await this.usuarioRepository.find();
     const usuarioLista = usuariosSalvos.map(
-      (usuario) => new ListaUsuarioDTO(usuario.id, usuario.email),
+      (usuario) => new ListaUsuarioDTO(usuario.id, usuario.nome, usuario.email),
     );
 
     return usuarioLista;
   }
 
-  async atualizaUsuario(id: string, novosDados: AtualizaUsuarioDTO) {
+  async buscaUmUsuario(id: number) {
+    await this.exist(id);
+
+    return this.usuarioRepository.findOneBy({ id });
+  }
+
+  async atualizaUsuario(id: number, novosDados: AtualizaUsuarioDTO) {
     const usuario = await this.usuarioRepository.findOneBy({ id });
 
     if (usuario === null) {
@@ -54,11 +72,17 @@ export class UsuarioService {
     return checkEmail;
   }
 
-  async deletaUsuario(id: string) {
-    const resultado = await this.usuarioRepository.delete(id);
+  async deletaUsuario(id: number) {
+    await this.exist(id);
 
-    if (!resultado.affected) {
-      throw new NotFoundException('O usuário não foi encontrado');
+    await this.usuarioRepository.delete(id);
+
+    return true;
+  }
+
+  async exist(id: number) {
+    if (!(await this.usuarioRepository.exists({ where: { id } }))) {
+      throw new NotFoundException(`O usuário ${id} não existe`);
     }
   }
 }

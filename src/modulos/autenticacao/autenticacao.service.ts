@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
 export interface UsuarioPayload {
-  sub: string;
+  sub: number;
   nomeUsuario: string;
 }
 

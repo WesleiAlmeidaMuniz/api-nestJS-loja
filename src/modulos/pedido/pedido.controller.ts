@@ -47,7 +47,7 @@ export class PedidoController {
   @Patch(':id')
   atualizaPedido(
     @Req() req: RequisicaoComUsuario,
-    @Param('id') pedidoId: string,
+    @Param('id') pedidoId: number,
     @Body() dadosDeAtualizacao: AtualizaPedidoDTO,
   ) {
     const usuarioId = req.usuario.sub;

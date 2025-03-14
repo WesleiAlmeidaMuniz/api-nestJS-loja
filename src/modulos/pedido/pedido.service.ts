@@ -5,32 +5,27 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PedidoEntity } from './pedido.entity';
-import { In, Not, Repository } from 'typeorm';
-import { UsuarioEntity } from '../../modulos/usuario/usuario.entity';
+import { PedidoEntity } from './entities/pedido.entity';
+import { In, Repository } from 'typeorm';
+
 import { StatusPedido } from './enum/statuspedido.enum';
 import { CriaPedidoDTO } from './dto/CriaPedido.dto';
-import { ItemPedidoEntity } from './itempedido.entity';
-import { ProdutoEntity } from '../produto/produto.entity';
+
+import { ProdutoEntity } from '../produto/entities/produto.entity';
 import { AtualizaPedidoDTO } from './dto/AtualizaPedido.dto';
+import { UsuarioEntity } from '../usuario/entities/usuario.entity';
+import { ItemPedidoEntity } from './entities/itempedido.entity';
+import { UsuarioService } from '../usuario/usuario.service';
+import { ProdutoService } from '../produto/produto.service';
 
 @Injectable()
 export class PedidoService {
   constructor(
     @InjectRepository(PedidoEntity)
     private readonly pedidoRepository: Repository<PedidoEntity>,
-    @InjectRepository(UsuarioEntity)
-    private readonly usuarioRepository: Repository<UsuarioEntity>,
-    @InjectRepository(ProdutoEntity)
-    private readonly produtoRepository: Repository<ProdutoEntity>,
+    private readonly usuarioService: UsuarioService,
+    private readonly produtoService: ProdutoService,
   ) {}
-
-  private async buscaUsuario(id) {
-    const usuario = await this.usuarioRepository.findOneBy({ id });
-    if (!usuario) throw new NotFoundException('O usuário não foi encontrado');
-
-    return usuario;
-  }
 
   private trataDadosDoPedido(
     dadosDoPedido: CriaPedidoDTO,
@@ -55,17 +50,18 @@ export class PedidoService {
     });
   }
 
-  async cadastroPedido(usuarioId: string, dadosDoPedido: CriaPedidoDTO) {
-    const usuario = await this.buscaUsuario(usuarioId);
+  async cadastroPedido(usuarioId: number, dadosDoPedido: CriaPedidoDTO) {
+    const usuario = await this.usuarioService.buscaUmUsuario(usuarioId);
+
+    if (!usuario) throw new NotFoundException('Usuario não encontrado');
 
     const produtosIds = dadosDoPedido.itensPedido.map(
       (itemPedido) => itemPedido.produtoId,
     );
-    const produtosRelacionados = await this.produtoRepository.findBy({
-      id: In(produtosIds),
-    });
+    const produtosRelacionados =
+      await this.produtoService.buscarProdutosPorIds(produtosIds);
 
-    this.trataDadosDoPedido(dadosDoPedido, produtosRelacionados);
+    await this.trataDadosDoPedido(dadosDoPedido, produtosRelacionados);
 
     const pedidoEntity = new PedidoEntity();
 
@@ -96,8 +92,8 @@ export class PedidoService {
     return pedidoCriado;
   }
 
-  async obtemPedidosDeUsuario(usuarioId: string) {
-    const usuario = await this.usuarioRepository.findOneBy({ id: usuarioId });
+  async obtemPedidosDeUsuario(usuarioId: number) {
+    const usuario = await this.usuarioService.buscaUmUsuario(usuarioId);
 
     if (usuario === null) {
       throw new NotFoundException('O usuario não foi encontrado');
@@ -111,7 +107,7 @@ export class PedidoService {
     });
   }
 
-  async atualizaPedido(id: string, dto: AtualizaPedidoDTO, usuarioId: string) {
+  async atualizaPedido(id: number, dto: AtualizaPedidoDTO, usuarioId: number) {
     const pedido = await this.pedidoRepository.findOne({
       where: { id },
       relations: { usuario: true },
@@ -121,14 +117,12 @@ export class PedidoService {
       throw new NotFoundException('O pedido não foi encontrado');
     }
 
-    if (pedido.usuario.id !== usuarioId)
+    if (pedido.usuario.id !== Number(usuarioId))
       throw new ForbiddenException(
         'Você não tem autorização para atualizar esse pedido',
       );
 
-    Object.assign(pedido, dto);
-
-    return this.pedidoRepository.save(pedido);
+    return this.pedidoRepository.update(pedido, dto);
   }
 
   async deletaPedido(id: string) {

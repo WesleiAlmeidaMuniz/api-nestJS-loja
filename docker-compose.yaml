@@ -1,45 +1,37 @@
-    version: '3.5'
-    
-    services:
-      postgres:
-        image: postgres:latest
-        environment:
-          POSTGRES_USER: ${DB_USERNAME}
-          POSTGRES_PASSWORD: ${DB_PASSWORD}
-          PGDATA: /data/postgres
-        volumes:
-          - postgres:/data/postgres
-        ports:
-          - "5432:5432"
-        networks:
-          - postgres
-        restart: unless-stopped
-    
-      pgadmin:
-        image: dpage/pgadmin4
-        environment:
-          PGADMIN_DEFAULT_EMAIL: ${DB_ADMIN_EMAIL}
-          PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD}
-        ports:
-          - "8081:80"
-        depends_on:
-          - postgres
-        networks:
-          - postgres
+version: '3.5'
 
-      redis:
-        container_name: redis-cache
-        image: redis:7.0-alpine
-        ports:
-          - 6379:6379
-        volumes:
-          - redis:/data
-
-
-    networks:
-      postgres:
-        driver: bridge
-    
+services:
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
-        postgres:
-        redis:
+      - mariadb:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - mariadb
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: ${DB_USERNAME}
+      PMA_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8081:80"
+    depends_on:
+      - mariadb
+    networks:
+      - mariadb
+
+networks:
+  mariadb:
+    driver: bridge
+
+volumes:
+  mariadb:

@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ListaProdutoDTO } from './dto/ListaProduto.dto';
-import { ProdutoEntity } from './produto.entity';
-import { Repository } from 'typeorm';
+import { ProdutoEntity } from './entities/produto.entity';
+import { In, Repository } from 'typeorm';
 import { AtualizaProdutoDTO } from './dto/AtualizaProduto.dto';
 import { CriaProdutoDTO } from './dto/CriaProduto.dto';
 
@@ -14,6 +18,15 @@ export class ProdutoService {
   ) {}
 
   async criaProduto(dadosProduto: CriaProdutoDTO) {
+    if (
+      await this.produtoRepository.exists({
+        where: { nome: dadosProduto.nome },
+      })
+    ) {
+      throw new BadRequestException(
+        'Já existe um produto cadastrado com esse nome!',
+      );
+    }
     const produtoEntity = new ProdutoEntity();
 
     produtoEntity.nome = dadosProduto.nome;
@@ -40,6 +53,8 @@ export class ProdutoService {
           produto.id,
           produto.nome,
           produto.quantidadeDisponivel,
+          produto.categoria,
+          produto.descricao,
           produto.caracteristicas,
           produto.imagem,
         ),
@@ -47,7 +62,15 @@ export class ProdutoService {
     return produtosLista;
   }
 
-  async listaUmProduto(id: string) {
+  async buscarProdutosPorIds(produtosIds: number[]): Promise<ProdutoEntity[]> {
+    if (!produtosIds.length) return []; // Retorna array vazio se não houver IDs
+
+    return await this.produtoRepository.findBy({
+      id: In(produtosIds),
+    });
+  }
+
+  async listaUmProduto(id: number) {
     const produto = await this.produtoRepository.findOne({
       where: { id },
       relations: {
@@ -58,34 +81,28 @@ export class ProdutoService {
 
     if (!produto) throw new NotFoundException('O produto não foi encontrado');
 
-    const produtoListado = new ListaProdutoDTO(
-      produto.id,
-      produto.nome,
-      produto.quantidadeDisponivel,
-      produto.caracteristicas,
-      produto.imagem,
-    );
-
-    return produtoListado;
+    return produto;
   }
 
-  async atualizaProduto(id: string, novosDados: AtualizaProdutoDTO) {
+  async atualizaProduto(id: number, novosDados: AtualizaProdutoDTO) {
     const entityName = await this.produtoRepository.findOneBy({ id });
 
     if (entityName === null) {
       throw new NotFoundException('O produto não foi encontrado');
     }
 
-    Object.assign(entityName, novosDados);
-
-    await this.produtoRepository.save(entityName);
+    return await this.produtoRepository.update(id, novosDados);
   }
 
-  async deletaProduto(id: string) {
-    const resultado = await this.produtoRepository.delete(id);
+  async deletaProduto(id: number) {
+    await this.exist(id);
+    await this.produtoRepository.delete(id);
+    return true;
+  }
 
-    if (!resultado.affected) {
-      throw new NotFoundException('O produto não foi encontrado');
+  async exist(id: number) {
+    if (!(await this.produtoRepository.exists({ where: { id } }))) {
+      throw new NotFoundException(`O produto ${id} não existe`);
     }
   }
 }

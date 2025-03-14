@@ -15,7 +15,6 @@ import { UsuarioService } from './usuario.service';
 import { HashearSenhaPipe } from '../../recursos/pipes/hashear-senha.pipe';
 import { AutenticacaoGuard } from '../autenticacao/autenticacao/autenticacao.guard';
 
-@UseGuards(AutenticacaoGuard)
 @Controller('/usuarios')
 export class UsuarioController {
   constructor(private usuarioService: UsuarioService) {}
@@ -31,11 +30,16 @@ export class UsuarioController {
     });
 
     return {
-      usuario: new ListaUsuarioDTO(usuarioCriado.id, usuarioCriado.nome),
+      usuario: new ListaUsuarioDTO(
+        usuarioCriado.id,
+        usuarioCriado.nome,
+        usuarioCriado.email,
+      ),
       messagem: 'usuário criado com sucesso',
     };
   }
 
+  @UseGuards(AutenticacaoGuard)
   @Get()
   async listUsuarios() {
     const usuariosSalvos = await this.usuarioService.listaUsuarios();
@@ -43,6 +47,7 @@ export class UsuarioController {
     return usuariosSalvos;
   }
 
+  @UseGuards(AutenticacaoGuard)
   @Get('/:email')
   async buscaPorEmail(@Param('email') email: string) {
     const usuario = await this.usuarioService.buscaPorEmail(email);
@@ -50,9 +55,10 @@ export class UsuarioController {
     return usuario;
   }
 
+  @UseGuards(AutenticacaoGuard)
   @Put('/:id')
   async atualizaUsuario(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() novosDados: AtualizaUsuarioDTO,
   ) {
     const usuarioAtualizado = await this.usuarioService.atualizaUsuario(
@@ -66,8 +72,9 @@ export class UsuarioController {
     };
   }
 
+  @UseGuards(AutenticacaoGuard)
   @Delete('/:id')
-  async removeUsuario(@Param('id') id: string) {
+  async removeUsuario(@Param('id') id: number) {
     const usuarioRemovido = await this.usuarioService.deletaUsuario(id);
 
     return {

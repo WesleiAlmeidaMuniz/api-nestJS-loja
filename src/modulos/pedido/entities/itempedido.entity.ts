@@ -1,11 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { PedidoEntity } from './pedido.entity';
-import { ProdutoEntity } from '../produto/produto.entity';
+import { ProdutoEntity } from '../../produto/entities/produto.entity';
 
 @Entity({ name: 'itens_pedido' })
 export class ItemPedidoEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn({ unsigned: true })
+  id: number;
 
   @Column({ name: 'quantidade', nullable: false })
   quantidade: number;

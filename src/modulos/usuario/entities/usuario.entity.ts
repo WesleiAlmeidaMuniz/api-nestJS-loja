@@ -1,5 +1,4 @@
 import { Exclude } from 'class-transformer';
-import { PedidoEntity } from '../pedido/pedido.entity';
 import {
   Entity,
   Column,
@@ -9,11 +8,12 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
 } from 'typeorm';
+import { PedidoEntity } from '../../pedido/entities/pedido.entity';
 
 @Entity({ name: 'usuarios' })
 export class UsuarioEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn({ unsigned: true })
+  id: number;
   @Column({ name: 'nome', length: 100, nullable: false })
   nome: string;
   @Column({ name: 'email', length: 70, nullable: false })
@@ -24,12 +24,12 @@ export class UsuarioEntity {
   senha: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: string;
+  createdAt: Date;
   @UpdateDateColumn({ name: 'update_at' })
-  updateAt: string;
+  updateAt?: Date;
   @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: string;
+  deletedAt?: Date;
 
   @OneToMany(() => PedidoEntity, (pedido) => pedido.usuario)
-  pedidos: PedidoEntity[];
+  pedidos?: PedidoEntity[];
 }
