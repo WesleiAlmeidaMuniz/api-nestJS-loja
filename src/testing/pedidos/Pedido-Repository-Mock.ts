@@ -6,8 +6,10 @@ export const pedidoRepositoryMock = {
   provide: getRepositoryToken(PedidoEntity),
   useValue: {
     save: jest.fn().mockResolvedValue(pedidoEntity[0]),
-    find: jest.fn(),
-    findOne: jest.fn(),
-    delete: jest.fn(),
+    find: jest.fn().mockResolvedValue(pedidoEntity[0]),
+    findOne: jest.fn().mockResolvedValue(pedidoEntity[0]),
+    update: jest.fn().mockResolvedValue(pedidoEntity[1]),
+    exists: jest.fn().mockResolvedValue(true),
+    delete: jest.fn().mockResolvedValue(true),
   },
 };

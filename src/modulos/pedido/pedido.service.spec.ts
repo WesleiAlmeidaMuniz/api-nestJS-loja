@@ -50,9 +50,31 @@ describe('PedidoService', () => {
     });
   });
 
-  describe('Read', () => {});
+  describe('Read', () => {
+    test('method read', async () => {
+      const result = await pedidoService.obtemPedidosDeUsuario(1);
 
-  describe('Update', () => {});
+      expect(result).toEqual(pedidoEntity[0]);
+    });
+  });
 
-  describe('Delete', () => {});
+  describe('Update', () => {
+    test('method update', async () => {
+      const result = await pedidoService.atualizaPedido(
+        1,
+        atualizaPedidoDTO,
+        1,
+      );
+
+      expect(result).toEqual(pedidoEntity[1]);
+    });
+  });
+
+  describe('Delete', () => {
+    test('method delete', async () => {
+      const result = await pedidoService.deletaPedido(1);
+
+      expect(result).toEqual(true);
+    });
+  });
 });

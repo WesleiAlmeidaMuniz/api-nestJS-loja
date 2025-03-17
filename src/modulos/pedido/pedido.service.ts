@@ -125,11 +125,17 @@ export class PedidoService {
     return this.pedidoRepository.update(pedido, dto);
   }
 
-  async deletaPedido(id: string) {
-    const resultado = await this.pedidoRepository.delete(id);
+  async deletaPedido(id: number) {
+    await this.exist(id);
 
-    if (!resultado.affected) {
-      throw new NotFoundException('O pedido não foi encontrado');
+    await this.pedidoRepository.delete(id);
+
+    return true;
+  }
+
+  async exist(id: number) {
+    if (!(await this.pedidoRepository.exists({ where: { id } }))) {
+      throw new NotFoundException(`O usuário ${id} não existe`);
     }
   }
 }
